@@ -8,6 +8,7 @@ package svoyikoziri.engine;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.Stack;
 import svoyikoziri.deck.Card;
 import svoyikoziri.deck.Rank;
@@ -23,33 +24,84 @@ import svoyikoziri.engine.exception.TakeAllCardsAsFirstPlayException;
 import svoyikoziri.player.Player;
 
 /**
- *
- * @author gabrielmsato
+ * Engine do jogo Svoyi Koziri <br>
+ * A engine é responsavel por reproduzir o jogo, ou seja, monta as maos dos jogadores, a mesa, assim como toma conta das jogadas realizadas
+ * pelos jogadores para ver se sao validas ou nao. O metodo playMatch() é responsavel por iniciar um jogo e assim retornara um vencedor ou um empate.
+ * 
+ * @author Gabriel Massuyoshi Sato  RA: 172278
  */
 public class EngineRA172278 extends Engine{
+    /**
+     * O jogador 1
+     */
     private final Player player1;
-    private final Player player2;
-    private final int MAX_ROUNDS;
-    private final long MAX_PLAY_TIME;
-    private int round;
-    private List<Card> deck;
-    private List<Card> player1Hand;
-    private List<Card> player2Hand;
-    private boolean verbose;
-    private List<Play> jogadas;
-    private int vitorias1;
-    private int vitorias2;
     
     /**
-     * 
-     * @param player1
-     * @param player2
-     * @param minRank
-     * @param seed
-     * @param maxRounds
-     * @param maxPlayTime
-     * @param verbose
-     * @throws SameTrumpColorsException 
+     * o Jogador 2
+     */
+    private final Player player2;
+    
+    /**
+     * O numero maximo de rodadas
+     */
+    private final int MAX_ROUNDS;
+    
+    /**
+     * O tempo maximo que cada jogada tem para ser realizada
+     */
+    private final long MAX_PLAY_TIME;
+    
+    /**
+     * O numero da rodada atual
+     */
+    private int round;
+    
+    /**
+     * Variavel utilizada primeiramente para o deck inicial. A partir do momento em que sao distribuidas as cartas, passa a ser a mesa do jogo
+     */
+    private List<Card> deck;
+    
+    /**
+     * A mao do jogador 1
+     */
+    private List<Card> player1Hand;
+    
+    /**
+     * A mao do jogador 2
+     */
+    private List<Card> player2Hand;
+    
+    /**
+     * A flag de verbosidade da Engine
+     */
+    private boolean verbose;
+    
+    /**
+     * A lista de jogadas realizadas durante o jogo
+     */
+    private List<Play> jogadas;
+    
+    /**
+     * O numero de rodadas que o jogador 1 venceu
+     */
+    private int vitoriasJogador1;
+    
+    /**
+     * O numero de rodadas que o jogador 2 venceu
+     */
+    private int vitoriasJogador2;
+    
+    
+    /**
+     * Construtor da Engine que cria um deck que vai de minRank ate ACE
+     * @param player1 O jogador 1
+     * @param player2 O jogador 2
+     * @param minRank Parametro que delimita o minimo rank que sera usado no jogo
+     * @param seed Semente para embaralhar o deck
+     * @param maxRounds Numero maximo de jogadas que o jogo pode ter
+     * @param maxPlayTime Tempo maximo que cada jogada pode durar
+     * @param verbose Flag de verbosidade, caso true, as mensagens da engine sao escritas na saida padrao
+     * @throws SameTrumpColorsException Caso o trunfo dos jogadores sejam da mesma cor, lanca uma excessao 
      */
     public EngineRA172278 (Player player1, Player player2, Rank minRank, long seed, int maxRounds, long maxPlayTime, boolean verbose) throws SameTrumpColorsException{
         if (player1.getTrump().getColor().equals(player2.getTrump().getColor())) {
@@ -75,31 +127,17 @@ public class EngineRA172278 extends Engine{
             }
         }
         
-//        int i = 0;
-//        for (Rank r : Rank.values()) {
-//            if (r.equals(minRank))
-//                break;
-//            i++;
-//        }
-//        for (i = i; i < Rank.values().length; i++) {
-//            this.deck.add(new Card(Suit.CLOVERS, Rank.values()[i]));
-//            this.deck.add(new Card(Suit.HEARTS, Rank.values()[i]));
-//            this.deck.add(new Card(Suit.PIKES, Rank.values()[i]));
-//            this.deck.add(new Card(Suit.TILES, Rank.values()[i]));
-//        }
-        
-        Collections.shuffle(deck);
+        Collections.shuffle(this.deck, new Random(seed));
     }
     
     /**
-     *
-     * @param player1
-     * @param player2
-     * @param deck
-     * @param maxRounds
-     * @param maxPlayTime
-     * @param verbose
-     * @throws SameTrumpColorsException
+     * Construtor da Engine que recebe um deck como parametro para uso no jogo
+     * @param player1 O jogador 1
+     * @param player2 O jogador 2
+     * @param maxRounds Numero maximo de jogadas que o jogo pode ter
+     * @param maxPlayTime Tempo maximo que cada jogada pode durar
+     * @param verbose Flag de verbosidade, caso true, as mensagens da engine sao escritas na saida padrao
+     * @throws SameTrumpColorsException Caso o trunfo dos jogadores sejam da mesma cor, lanca uma excessao 
      */
     public EngineRA172278 (Player player1, Player player2 , List<Card> deck, int maxRounds, long maxPlayTime, boolean verbose) throws SameTrumpColorsException {
         if (player1.getTrump().getColor().equals(player2.getTrump().getColor())) {
@@ -110,14 +148,12 @@ public class EngineRA172278 extends Engine{
         this.MAX_ROUNDS = maxRounds;
         this.MAX_PLAY_TIME = maxPlayTime;
         this.round = 0; 
+        this.verbose = verbose;
         this.deck = new ArrayList<>();
         this.deck.addAll(deck);
-        this.verbose = verbose;
         this.player1Hand = new ArrayList<>();
         this.player2Hand = new ArrayList<>();
         this.jogadas = new ArrayList<>();
-        
-//        Collections.shuffle(deck);
     }
     
     /**
@@ -139,7 +175,7 @@ public class EngineRA172278 extends Engine{
     }
 
     /**
-     * Retorna a mao de um jogador
+     * Retorna a mao de um jogador, por meio de uma lista imutavel
      * @param player O jogador que a mao sera retornada
      * @return A mao do jogador passada por parametro
      */
@@ -181,7 +217,7 @@ public class EngineRA172278 extends Engine{
     }
     
     /**
-     * Funcao que retorna uma lista de jogadas realizadas no jogo
+     * Funcao que retorna uma lista de jogadas realizadas no jogo, por meio de uma lista imutavel
      * @return Lista com as jogadas realizadas durante o jogo
      */
     @Override
@@ -189,6 +225,18 @@ public class EngineRA172278 extends Engine{
         return Collections.unmodifiableList(this.jogadas);
     }
 
+    /**
+     * Funcao que inicia a partida do jogo
+     * @return O jogador vencedor ou null, caso ocorra empate
+     * @throws NullPlayException Excessao lancada quando um jogador realizada uma jogada nula
+     * @throws PlayANullCardException Excessao lancada quando um jogador joga uma carta nula
+     * @throws PlayACardNotInHandException Excessao lancada quando um jogador joga uma carta que nao esta em suas maos
+     * @throws TakeAllCardsAsFirstPlayException Excessao lancada quando o jogador tenta pegar todas as cartas quando é o primeiro a jogar
+     * na rodada
+     * @throws PlayAWorseCardException Excessao lancada quando o jogador tenta jogar uma carta que nao é maior que a carta da mesa
+     * @throws MaxPlayTimeExceededException Excessao lancada quando o tempo limite de uma jogada é estourado
+     * @throws InvalidPlayException Excessao lancada quando o jogador, ao realizar uma jogada, lanca uma excessao
+     */
     @Override
     public Player playMatch() throws NullPlayException, PlayANullCardException, PlayACardNotInHandException, TakeAllCardsAsFirstPlayException, PlayAWorseCardException, MaxPlayTimeExceededException, InvalidPlayException {
         boolean  isPlayer1 = true;
@@ -196,7 +244,7 @@ public class EngineRA172278 extends Engine{
         int i = 0;
         long startTime;
 
-        
+        // Imprime na saida padrao os trunfos de cada jogador
         this.println(Engine.getPlayerTrumpMessage(true, this.getPlayer1Trump()));
         this.println(Engine.getPlayerTrumpMessage(false, this.getPlayer2Trump()));
         
@@ -244,6 +292,9 @@ public class EngineRA172278 extends Engine{
         // Aqui comeca as rodadas do jogo-----------------------------------
         while (true) {
             this.round++;
+            
+            // Caso o numero maximo de rodadas seja atingido, o jogo termina e o vencedor é
+            // definido no trecho de codigo abaixo
             if (this.round > this.MAX_ROUNDS) {
                 if (this.player1Hand.size() < this.player2Hand.size()) {
                     // Imprime na saida padrao o vencedor do jogo
@@ -254,11 +305,11 @@ public class EngineRA172278 extends Engine{
                     this.println(Engine.getWinnerPlayerMessage(false));
                     return player2;
                 } else {
-                    if (this.vitorias1 > this.vitorias2) {
+                    if (this.vitoriasJogador1 > this.vitoriasJogador2) {
                         // Imprime na saida padrao o vencedor do jogo
                         this.println(Engine.getWinnerPlayerMessage(true));
                         return player1;
-                    } else if (this.vitorias1 < this.vitorias2){
+                    } else if (this.vitoriasJogador1 < this.vitoriasJogador2){
                         // Imprime na saida padrao o vencedor do jogo
                         this.println(Engine.getWinnerPlayerMessage(false));
                         return player2;
@@ -291,7 +342,7 @@ public class EngineRA172278 extends Engine{
             for (Card c : this.deck)
                 this.println(c.toString());
            
-            
+            // Caso o jogador 1 comece a rodada, o bloco de codigo if é executado
             if (isPlayer1) {
                 // Imprime na saida padrao qual jogador comeca o round
                 this.println(Engine.getPlayerStartsRoundMessage(true));
@@ -373,7 +424,7 @@ public class EngineRA172278 extends Engine{
                     // Imprime na saida padrao o tipo de jogada do jogador
                     this.println(Engine.getValidPlayMessage(false, jogada));
                     this.println(Engine.getPlayerWinsRoundMessage(true));
-                    this.vitorias1++;
+                    this.vitoriasJogador1++;
                     isPlayer1 = true;
                     continue;
                 }
@@ -389,7 +440,7 @@ public class EngineRA172278 extends Engine{
                         this.println(Engine.getValidPlayMessage(false, jogada));
                         // Imprime na saida padrao o jogador que venceu o round
                         this.println(Engine.getPlayerWinsRoundMessage(false));
-                        this.vitorias2++;
+                        this.vitoriasJogador2++;
                     } else
                         throw new PlayAWorseCardException(false, jogada.getCard(), this.deck.get(this.deck.size() - 1));
                     
@@ -402,7 +453,7 @@ public class EngineRA172278 extends Engine{
                     this.println(Engine.getValidPlayMessage(false, jogada));
                     // Imprime na saida padrao o jogador que venceu o round
                     this.println(Engine.getPlayerWinsRoundMessage(false));
-                    this.vitorias2++;
+                    this.vitoriasJogador2++;
                 } else
                     throw new PlayAWorseCardException(false, jogada.getCard(), this.deck.get(this.deck.size() - 1));
                 
@@ -498,7 +549,7 @@ public class EngineRA172278 extends Engine{
                     // Imprime na saida padrao o tipo de jogada do jogador
                     this.println(Engine.getValidPlayMessage(true, jogada));
                     this.println(Engine.getPlayerWinsRoundMessage(false));
-                    this.vitorias2++;
+                    this.vitoriasJogador2++;
                     isPlayer1 = false;
                     continue;
                 }
@@ -514,7 +565,7 @@ public class EngineRA172278 extends Engine{
                         this.println(Engine.getValidPlayMessage(true, jogada));
                         // Imprime na saida padrao o jogador que venceu o round
                         this.println(Engine.getPlayerWinsRoundMessage(true));
-                        this.vitorias1++;
+                        this.vitoriasJogador1++;
                     } else
                         throw new PlayAWorseCardException(true, jogada.getCard(), this.deck.get(this.deck.size() - 1));
                     
@@ -527,7 +578,7 @@ public class EngineRA172278 extends Engine{
                     this.println(Engine.getValidPlayMessage(true, jogada));
                     // Imprime na saida padrao o jogador que venceu o round
                     this.println(Engine.getPlayerWinsRoundMessage(true));
-                    this.vitorias1++;
+                    this.vitoriasJogador1++;
                 } else
                     throw new PlayAWorseCardException(true, jogada.getCard(), this.deck.get(this.deck.size() - 1));
                 
