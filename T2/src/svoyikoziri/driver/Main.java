@@ -7,7 +7,7 @@ import java.util.TreeSet;
 import svoyikoziri.deck.Card;
 import svoyikoziri.deck.Rank;
 import svoyikoziri.deck.Suit;
-import svoyikoziri.engine.DefaultEngine;
+import svoyikoziri.engine.EngineRA172278;
 import svoyikoziri.engine.Engine;
 import svoyikoziri.engine.Play;
 import svoyikoziri.engine.exception.InvalidPlayException;
@@ -79,7 +79,7 @@ public class Main {
         player2 = new DeterministicDummyPlayer(Suit.TILES);
 
         try {
-            engine = new DefaultEngine(player1, player2, deck, 
+            engine = new EngineRA172278(player1, player2, deck, 
                     Engine.DEFAULT_MAX_ROUNDS, Engine.DEFAULT_MAX_PLAY_TIME, 
                     false);
         } catch (SameTrumpColorsException stce) {
@@ -91,7 +91,7 @@ public class Main {
         player2 = new DeterministicDummyPlayer(Suit.CLOVERS);
 
         try {
-            engine = new DefaultEngine(player1, player2, deck, 
+            engine = new EngineRA172278(player1, player2, deck, 
                     Engine.DEFAULT_MAX_ROUNDS, Engine.DEFAULT_MAX_PLAY_TIME, 
                     true);
             
@@ -106,7 +106,7 @@ public class Main {
         player2 = new DeterministicDummyPlayer(Suit.PIKES);
 
         try {
-            engine = new DefaultEngine(player1, player2, deck, 
+            engine = new EngineRA172278(player1, player2, deck, 
                     Engine.DEFAULT_MAX_ROUNDS, Engine.DEFAULT_MAX_PLAY_TIME, 
                     false);
             
@@ -122,7 +122,7 @@ public class Main {
         player2 = new DeterministicDummyPlayer(Suit.CLOVERS);
 
         try {
-            engine = new DefaultEngine(player1, player2, deck, 
+            engine = new EngineRA172278(player1, player2, deck, 
                     Engine.DEFAULT_MAX_ROUNDS, Engine.DEFAULT_MAX_PLAY_TIME, 
                     true);
             
@@ -138,7 +138,7 @@ public class Main {
         player2 = new DeterministicDummyPlayer(Suit.PIKES);
 
         try {
-            engine = new DefaultEngine(player1, player2, deck, 
+            engine = new EngineRA172278(player1, player2, deck, 
                     Engine.DEFAULT_MAX_ROUNDS, Engine.DEFAULT_MAX_PLAY_TIME, 
                     false);
             
@@ -154,7 +154,7 @@ public class Main {
         		new PlayAWorseCardException(false));
 
         try {
-            engine = new DefaultEngine(player1, player2, deck, 
+            engine = new EngineRA172278(player1, player2, deck, 
                     Engine.DEFAULT_MAX_ROUNDS, Engine.DEFAULT_MAX_PLAY_TIME, 
                     true);
             
@@ -170,7 +170,7 @@ public class Main {
         player2 = new DeterministicDummyPlayer(Suit.TILES);
 
         try {
-            engine = new DefaultEngine(player1, player2, deck, 
+            engine = new EngineRA172278(player1, player2, deck, 
                     Engine.DEFAULT_MAX_ROUNDS, Engine.DEFAULT_MAX_PLAY_TIME, 
                     false);
             
@@ -186,7 +186,7 @@ public class Main {
         player2 = new DeterministicDummyPlayer(Suit.HEARTS);
 
         try {
-            engine = new DefaultEngine(player1, player2, deck, 
+            engine = new EngineRA172278(player1, player2, deck, 
                     Engine.DEFAULT_MAX_ROUNDS, Engine.DEFAULT_MAX_PLAY_TIME, 
                     true);
             
@@ -199,7 +199,7 @@ public class Main {
         player1 = new DeterministicDummyPlayer(Suit.PIKES);
         player2 = new DeterministicDummyPlayer(Suit.TILES);
 
-        engine = new DefaultEngine(player1, player2, deck, 
+        engine = new EngineRA172278(player1, player2, deck, 
                 Engine.DEFAULT_MAX_ROUNDS, Engine.DEFAULT_MAX_PLAY_TIME, 
                 false);
 
@@ -277,7 +277,7 @@ public class Main {
         player1 = new DeterministicDummyPlayer(Suit.HEARTS);
         player2 = new DeterministicDummyPlayer(Suit.CLOVERS);
 
-        engine = new DefaultEngine(player1, player2, deck, 
+        engine = new EngineRA172278(player1, player2, deck, 
                 Engine.DEFAULT_MAX_ROUNDS, Engine.DEFAULT_MAX_PLAY_TIME, 
                 true);
 
